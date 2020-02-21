@@ -14,6 +14,7 @@ def check_size():
     '''
         To check the shape of images and to see if any reshaping is needed
     '''
+    print("Checking size of images")
     size = []
 
     for filename in glob.glob(dir):
@@ -22,11 +23,14 @@ def check_size():
     o = Counter(chain(*size))
     print(o)
     '''
-        All images are 500X500 and RGB
+        All images are 500x500 and RGB
     '''
 
 def resize():
-
+    '''
+        Resize images to 100x100 and save it in the form of a greyscale image
+    '''
+    print("Resizing the images")
     scale_percent = 0.2
 
     for filename in glob.glob(dir):
@@ -38,16 +42,33 @@ def resize():
         os.remove(filename)
         cv2.imwrite(filename, smaller)
 
+def convert_images_to_array():
+    print("Converting images to array")
+    WIDTH, HEIGHT = 100, 100
+    all_images = []
+    for image in glob.glob(dir):
+        img = io.imread(image)
+        img = img.reshape([WIDTH, HEIGHT, 1])
+        all_images.append(img)
+
+    train_data = np.array(all_images)
+    return train_data
+
+def convert_labels_to_array():
+    pass
+
+
 
 if __name__=='__main__':
     # check size of all the images
-    check_size()
+    # check_size()
 
     # resize images to 100X100 images in greyscale
-    resize()
+    # resize()
 
     # convert the images to an array for training
     x_train = convert_images_to_array()
+    print(x_train.shape)
 
     # convert labels to array
-    y_train = convert_labels_to_array()
+    # y_train = convert_labels_to_array()
