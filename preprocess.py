@@ -4,7 +4,8 @@ from skimage import io
 import glob, cv2, os
 import numpy as np
 
-dir = '/home/puneeth/Desktop/projects/Flower-Classification/data/train/*.jpg'
+train_dir = '/home/puneeth/Desktop/projects/Flower-Classification/data/train/*.jpg'
+test_dir = '/home/puneeth/Desktop/projects/Flower-Classification/data/test/*.jpg'
 
 def ret_size(image):
     img = cv2.imread(image, 0) # load image in greyscale mode
@@ -26,14 +27,16 @@ def check_size():
         All images are 500x500 and RGB
     '''
 
-def resize():
+def train_resize():
     '''
         Resize images to 100x100 and save it in the form of a greyscale image
+
+        Returns: Resized images
     '''
-    print("Resizing the images")
+    print("Resizing the train images")
     scale_percent = 0.2
 
-    for filename in glob.glob(dir):
+    for filename in glob.glob(train_dir):
         original_img = cv2.imread(filename, 0)
         width = int(original_img.shape[0]*scale_percent)
         height = int(original_img.shape[1]*scale_percent)
@@ -42,20 +45,23 @@ def resize():
         os.remove(filename)
         cv2.imwrite(filename, smaller)
 
-def convert_images_to_array():
-    print("Converting images to array")
-    WIDTH, HEIGHT = 100, 100
-    all_images = []
-    for image in glob.glob(dir):
-        img = io.imread(image)
-        img = img.reshape([WIDTH, HEIGHT, 1])
-        all_images.append(img)
+def test_resize():
+    '''
+        Resize images to 100x100 and save it in the form of a greyscale image
 
-    train_data = np.array(all_images)
-    return train_data
+        Returns: Resized images
+    '''
+    print("Resizing the test images")
+    scale_percent = 0.2
 
-def convert_labels_to_array():
-    pass
+    for filename in glob.glob(test_dir):
+        original_img = cv2.imread(filename, 0)
+        width = int(original_img.shape[0]*scale_percent)
+        height = int(original_img.shape[1]*scale_percent)
+        dim = (width, height)
+        smaller = cv2.resize(original_img, dim, interpolation=cv2.INTER_AREA)
+        os.remove(filename)
+        cv2.imwrite(filename, smaller)
 
 
 
@@ -67,8 +73,9 @@ if __name__=='__main__':
     # resize()
 
     # convert the images to an array for training
-    x_train = convert_images_to_array()
-    print(x_train.shape)
+    # x_train = convert_images_to_array()
+    # print(x_train.shape)
 
     # convert labels to array
     # y_train = convert_labels_to_array()
+    # test_resize()
