@@ -1,17 +1,47 @@
+import sys
+from os.path import join
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+import cv2
+import tensorflow as tf
+from keras.applications.vgg16 import VGG16
+from keras.models import Sequential
+from keras.callbacks import EarlyStopping
+from keras.layers import Dense
+from keras.utils import to_categorical
+from keras.preprocessing.image import ImageDataGenerator
+import os
 
+with tf.device('/device:XLA_GPU:0'):
+    train_directory = '/home/puneeth/Desktop/projects/Flower-Classification/data/train/*'
+    test_directory = '/home/puneeth/Desktop/projects/Flower-Classification/data/test/*'
+    BATCH_SIZE = 32
+    TARGET_SIZE = (100, 100)
 
+    train_datagen = ImageDataGenerator(featurewise_center=True, featurewise_std_normalization=True,
+        rotation_range=20, width_shift_range=0.2, height_shift_range=0.2, horizontal_flip=True,
+        vertical_flip=True)
+    
+    test_datagen = ImageDataGenerator(rescale=1./255)
 
-# import tensorflow as tf
-# from tensorflow.contrib.compiler import xla
-# import numpy as np
+    train_generator = train_datagen.flow_from_directory(train_directory, target_size=TARGET_SIZE,
+        batch_size=BATCH_SIZE)
 
-# with tf.device('/device:XLA_GPU:0'):
-#   a = tf.constant([1.0, 2.0, 3.0, 4.0, 5.0, 6.0], shape=[2, 3], name='a')
-#   b = tf.constant([7.0, 8.0, 9.0, 10.0, 11.0, 12.0], shape=[3, 2], name='b')
-#   c = tf.matmul(a, b)
-# # Creates a session with allow_soft_placement and log_device_placement set
-# # to True.
-# sess = tf.Session(config=tf.ConfigProto(allow_soft_placement=True, log_device_placement=True))
-# # Runs the op.
-# print(sess.run(c))
+    test_generator = test_datagen.flow_from_directory(test_directory, target_size=TARGET_SIZE,
+        batch_size=BATCH_SIZE)
 
+    vgg = VGG16(weights='imagenet', include_top=True)
+
+    vgg.summary()
+
+    model = Sequential()
+    for layer in vgg.layers[:-1]:
+        model.add(layer)
+
+    for layer in model.layers[:]:
+        layer.trainable = False
+
+    model.add(Dense(102, activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+    model.summary()
