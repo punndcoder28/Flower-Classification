@@ -34,10 +34,10 @@ def train_resize():
         Returns: Resized images
     '''
     print("Resizing the train images")
-    scale_percent = 0.2
+    scale_percent = 0.448
 
     for filename in glob.glob(train_dir):
-        original_img = cv2.imread(filename, 0)
+        original_img = cv2.imread(filename)
         width = int(original_img.shape[0]*scale_percent)
         height = int(original_img.shape[1]*scale_percent)
         dim = (width, height)
@@ -52,7 +52,7 @@ def test_resize():
         Returns: Resized images
     '''
     print("Resizing the test images")
-    scale_percent = 0.2
+    scale_percent = 0.
 
     for filename in glob.glob(test_dir):
         original_img = cv2.imread(filename, 0)
